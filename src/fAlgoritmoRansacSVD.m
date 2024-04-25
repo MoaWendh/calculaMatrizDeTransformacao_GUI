@@ -1,4 +1,4 @@
-function [R, t, pcTransformada] = fAlgoritmoRansacSVD(points_toAligne, points_ref, maxDistance, numIterations)
+function [R, t, points_refInliers, pcTransformada] = fAlgoritmoRansacSVD(points_toAligne, points_ref, maxDistance, numIterations)
     
     numPointsToAligne= size(points_toAligne, 1);
     numPointsRef= size(points_ref, 1);
