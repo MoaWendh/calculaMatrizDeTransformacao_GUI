@@ -46,6 +46,8 @@ function [R, t, points_refInliers, pcTransformada] = fAlgoritmoRansacSVD(points_
     % Use apenas os inliers para estimar a transformação final usando SVD
     points_toAligneInliers= points_toAligne(bestInliers, :);
     points_refInliers= points_ref(bestInliers, :);
-    [R, t, pcTransformada]= fAlgoritmoSVD(points_toAligneInliers, points_refInliers);
+    
+    % Chama a função para aplicar o algoritmo SVD:
+    [R, t, pcTransformada]= fAlgoritmoSVD(points_refInliers, points_toAligneInliers);
     inliers= bestInliers;    
 end

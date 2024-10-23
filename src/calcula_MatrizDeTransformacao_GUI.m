@@ -22,7 +22,7 @@ function varargout = calcula_MatrizDeTransformacao_GUI(varargin)
 
 % Edit the above text to modify the response to help calcula_MatrizDeTransformacao_GUI
 
-% Last Modified by GUIDE v2.5 23-Apr-2024 18:53:12
+% Last Modified by GUIDE v2.5 11-Oct-2024 18:34:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,8 +52,9 @@ function calcula_MatrizDeTransformacao_GUI_OpeningFcn(hObject, eventdata, handle
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to calcula_MatrizDeTransformacao_GUI (see VARARGIN)
 
-handles.pathToRead= 'C:\Projetos\Matlab\programas_GUI\calculaMatrizDeTransformacao_GUI\in';
-handles.pathToSave= 'C:\Projetos\Matlab\programas_GUI\calculaMatrizDeTransformacao_GUI\out';
+handles.pathToRead= 'C:\Users\mwend\OneDrive\Particulares\Projetos\Matlab\programas_GUI\calculaMatrizDeTransformacao_GUI\in';
+handles.pathToSave= 'C:\Users\mwend\OneDrive\Particulares\Projetos\Matlab\programas_GUI\calculaMatrizDeTransformacao_GUI\out';
+handles.pathToSaveFigure= 'C:\Users\mwend\OneDrive\Particulares\Projetos\Matlab\programas_GUI';
 
 handles.PC_Referencia_Carregada= 0;
 handles.PCs_ParaReferenciamento_Carregadas= 0;
@@ -199,12 +200,12 @@ function pbCalculaTransformacao_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 clc;
 
-% Chama função para determinar as matrizes de trnaformação M:
-[handles.M handles.pcTransformada handles.SSE]= fAplicaTransformacaoDeCorpoRigido(handles.pcRef, handles.pcsParaReferenciar, ... 
-                                                                      handles.pathToSave, ...
-                                                                      handles.HabRANSAC, ...
-                                                                      handles.DistanciaMaxima, ...
-                                                                      handles.NumMaxIteracoes);
+% Chama função para determinar as matrizes de transformação M:
+[handles.M handles.pcTransformada handles.RMSE]= fAplicaTransformacaoDeCorpoRigido(handles.pcRef, handles.pcsParaReferenciar, ... 
+                                                                                  handles.pathToSave, ...
+                                                                                  handles.HabRANSAC, ...
+                                                                                  handles.DistanciaMaxima, ...
+                                                                                  handles.NumMaxIteracoes);
 
 % Salva as matrizes de tranformação M:
 if handles.HabSaveMatrizTransformacao
@@ -220,9 +221,9 @@ if handles.HabSaveMatrizTransformacao
     fSalvaMatrizM(handles.M, path);
 end
 
-ErroQuadraticoTotal= sum(handles.SSE)/length(handles.SSE);
+handles.RMSE_total= sum(handles.RMSE)/length(handles.RMSE);
 
-msg= sprintf('Foram calculadas %d transformações.\nErro quadrático total= %.3f', length(handles.M), ErroQuadraticoTotal);
+msg= sprintf('Foram calculadas %d transformações.\nErro quadrático total= %.3f', length(handles.M), handles.RMSE_total);
 uiwait(msgbox(msg, 'Ok', 'modal'));
 
 handles.pbShowPC_Transformada.Enable= 'on';
@@ -239,7 +240,8 @@ function pbShowPC_Transformada_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-fShowPCs(handles.pcRef, handles.pcsParaReferenciar, handles.pcTransformada);
+handles.pathToSaveFigure= fShowPCs(handles.pcRef, handles.pcsParaReferenciar, handles.pcTransformada, ...
+                                   handles.HabSalvarGraficos, handles.pathToSaveFigure, handles.RMSE_total);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -457,3 +459,32 @@ handles.DistanciaMaxima= str2num(hObject.String);
 
 % Update handles structure
 guidata(hObject, handles);
+
+
+% --- Executes on button press in rdSaveGraph.
+function rdSaveGraph_Callback(hObject, eventdata, handles)
+% hObject    handle to rdSaveGraph (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rdSaveGraph
+
+handles.HabSalvarGraficos= hObject.Value;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
+
+% --- Executes during object creation, after setting all properties.
+function rdSaveGraph_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to rdSaveGraph (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+handles.HabSalvarGraficos= hObject.Value;
+
+% Update handles structure
+guidata(hObject, handles);
+
+
